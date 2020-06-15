@@ -5,9 +5,9 @@ PID_FILE=".pid"
 DATE=$(date)
 
 function startup() {
-  git pull origin master
-  pip install --upgrade -r requirements.txt
-  nohup python bot.py > ./output.txt 2>&1 &
+  echo "$DATE - $(git pull origin master)\n"
+  echo "$DATE - $(pip install --upgrade -r requirements.txt)\n"
+  echo "$DATE - $(nohup python bot.py > ./output.txt 2>&1 &)\n"
   echo $! > $PID_FILE
   echo "$DATE - Started new Discord Bot process"
 }
