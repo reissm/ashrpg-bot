@@ -22,8 +22,6 @@ roll_client = RollClient()
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
-    with open('.pid', 'w') as f:
-        f.write(str(os.getpid()))
     await bot.change_presence(activity=Game(name="AshRPG"), status="https://ashenkingdoms.com")
 
 @bot.event
