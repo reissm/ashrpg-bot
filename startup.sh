@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PID_FILE=".pid"
+PID_FILE="${PWD}/.pid"
 
 DATE=$(date)
 
@@ -12,9 +12,8 @@ function startup() {
   echo -e "$DATE - Started new Discord Bot process\n"
 }
 
+echo -e "$DATE - Using pidfile ${PID_FILE}"
 if [ -f "$PID_FILE" ]; then
-  PROCESS=$(echo "$PID_FILE")
-
   if pgrep -F $PID_FILE; then
       echo -e "$DATE - Process already running\n"
   else
