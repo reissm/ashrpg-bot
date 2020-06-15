@@ -3,4 +3,4 @@ from ashrpg.feat_client import FeatClient
 from ashrpg.roll_client import RollClient
 
 rc = RollClient()
-rc.roll_dice('4d+3')
+print(rc.roll_dice('4d6+2 6d4'))

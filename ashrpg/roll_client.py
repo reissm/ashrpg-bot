@@ -3,13 +3,31 @@ import re
 
 class RollClient():
 
-    regex = '((\d+)d(\d+)\s*([+|-]\s*\d+)?)+'
+    regex = '(\s*(\d+)d(\d+)\s*([+|-]\s*\d+)?)'
 
     def __init__(self):
         self.pattern = re.compile(self.regex)
 
     def roll_dice(self, query):
-        parsed = re.match(self.pattern, query)
+        next_q = query
+        parsed = re.match(self.pattern, next_q)
+        result = []
+        total = 0
+        max = 100 # Lets prevent endless loops, shall we?
+
+        while parsed and max >= 0:
+            s, t = self.handle_rolled_section(next_q)
+            next_q = next_q.replace(parsed.group(1), '')
+            total += t
+            result.append(s)
+            parsed = re.match(self.pattern, next_q)
+            max -= 1
+
+        total_roll = f"{' + '.join(result)}= {total}"
+        return total_roll
+
+    def handle_rolled_section(self, part):
+        parsed = re.match(self.pattern, part)
         result = []
         total = 0
 
@@ -31,5 +49,4 @@ class RollClient():
             else:
                 total -= int(extra[1:])
 
-        total_roll = f"({' + '.join(result[:int(parsed.group(2))])}) {' '.join(result[int(parsed.group(2)):])} = {total}"
-        return total_roll
+        return f"({' + '.join(result[:int(parsed.group(2))])}) {' '.join(result[int(parsed.group(2)):])}", total
