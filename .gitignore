@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-**/.pid
 
 # C extensions
 *.so
@@ -137,3 +136,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Other files
+**/.pid
+**/nohup.out
