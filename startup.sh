@@ -3,7 +3,7 @@
 PID_FILE=".pid"
 
 function startup() {
-  nohup my_command > ./output.txt 2>&1 &
+  nohup python bot.py > ./output.txt 2>&1 &
   echo $! > $PID_FILE
   echo "Started new Discord Bot process"
 }
