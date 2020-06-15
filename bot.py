@@ -11,7 +11,7 @@ from discord.ext import commands
 
 load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv('DISCORD_TOKEN').strip()
 
 bot = commands.Bot(command_prefix='!')
 
