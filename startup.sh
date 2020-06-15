@@ -6,7 +6,7 @@ DATE=$(date)
 
 function startup() {
   git pull origin master
-  python install --upgrade -r requirements.txt
+  pip install --upgrade -r requirements.txt
   nohup python bot.py > ./output.txt 2>&1 &
   echo $! > $PID_FILE
   echo "$DATE - Started new Discord Bot process"
