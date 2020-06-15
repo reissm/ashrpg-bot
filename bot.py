@@ -1,5 +1,6 @@
 import os
 import random
+import urllib3
 
 from ashrpg.class_client import ClassClient
 from ashrpg.feat_client import FeatClient
@@ -9,6 +10,7 @@ from discord import Embed, Color, Game
 from discord.ext import commands
 
 load_dotenv()
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='!')
@@ -20,6 +22,8 @@ roll_client = RollClient()
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
+    with open('.pid', 'w') as f:
+        f.write(str(os.getpid()))
     await bot.change_presence(activity=Game(name="AshRPG"), status="https://ashenkingdoms.com")
 
 @bot.event
