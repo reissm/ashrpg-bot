@@ -96,4 +96,21 @@ async def roll_dice(ctx, *args):
 
     await ctx.send(embed=response)
 
+@bot.command(name='refresh', help='<cache> -- Refresh cache(s) for the various datapoints')
+async def refresh_cache(ctx, cache: str):
+    refreshed = 'nothing'
+
+    if not cache or cache.lower() == 'all':
+        feat_client.refresh_cache()
+        class_client.refresh_class_list()
+        refreshed = 'all'
+    elif cache.lower() == 'class':
+        class_client.refresh_class_list()
+        refreshed = 'classes'
+    elif cache.lower() == 'feats':
+        feat_client.refresh_cache()
+        refreshed = 'feats'
+
+    await ctx.send(f"Refreshed cache for {refreshed}")
+
 bot.run(TOKEN)

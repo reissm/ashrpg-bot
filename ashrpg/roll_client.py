@@ -3,7 +3,6 @@ import re
 
 class RollClient():
 
-    # regex = '(\s*(\d+)d(\d+)\s*([+|-]\s*\d+)?)'
     regex = '(\s*((\d+)d(\d+)|((?!d)\d+))\s*([+-])?)'
 
     def __init__(self):
@@ -19,27 +18,43 @@ class RollClient():
         try:
             while next_q and max >= 0:
                 s, t, o, r = self.handle_rolled_section(next_q)
+
+                # Shorten the query string by removing the currently handled section
                 next_q = next_q.replace(r, '')
 
+                # Perform the operation based on the operator
                 if next_op == '+':
                     total += t
                 else:
                     total -= t
+
+                # Add the string representation to the list, then set the next operand
                 result.append(s)
                 result.append(o if o and next_q else '')
                 next_op = o
                 max -= 1
 
+            # Join all of the strings together by spaces, since this includes
+            #   the dice roll lists, operators, and single values
             total_roll = f"{' '.join(result)} = {total}"
             return total_roll
         except:
+            # Return empty value so the bot knows what to do with it
             return None
 
     def handle_rolled_section(self, part):
+        """
+        Returns a tuple:
+            - String representation of the part
+            - The integer value of the part
+            - The next operator (if one exists)
+            - The string value of what was matched
+        """
         parsed = re.match(self.pattern, part)
         result = []
         total = 0
 
+        # Something went wrong with the parsing; raise an error instead of returning the tuple
         if not parsed:
             raise RuntimeError("Unable to parse request")
 

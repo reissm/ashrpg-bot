@@ -141,3 +141,4 @@ cython_debug/
 **/.pid
 **/nohup.out
 **/output.txt
+test.py
