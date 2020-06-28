@@ -1,0 +1,20 @@
+{
+  "tangle": {
+      "keys": ["tangle"],
+      "responses": ["🐍Ssssssssss 🐍"],
+      "ignoreCase": true,
+      "tagUser": false
+  },
+  "ashrpg": {
+      "keys": ["\\ashrpg/"],
+      "responses": ["\\ashrpg/"],
+      "ignoreCase": true,
+      "tagUser": false
+  },
+  "cry": {
+    "keys": [":(", ":frowning:", "😦"],
+    "responses": ["Remember, crying is a free action."],
+    "ignoreCase": false,
+    "tagUser": true
+  }
+}

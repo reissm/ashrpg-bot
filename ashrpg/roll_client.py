@@ -36,11 +36,11 @@ class RollClient():
 
             # Join all of the strings together by spaces, since this includes
             #   the dice roll lists, operators, and single values
-            total_roll = f"{' '.join(result)} = {total}"
-            return total_roll
+            roll_string = f"{' '.join(result)}"
+            return roll_string, total
         except:
             # Return empty value so the bot knows what to do with it
-            return None
+            return None, None
 
     def handle_rolled_section(self, part):
         """

@@ -2,6 +2,7 @@ import os
 import random
 import urllib3
 
+from ashrpg.chat_client import ChatClient
 from ashrpg.class_client import ClassClient
 from ashrpg.feat_client import FeatClient
 from ashrpg.roll_client import RollClient
@@ -13,8 +14,11 @@ load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 TOKEN = os.getenv('DISCORD_TOKEN').strip()
 
-bot = commands.Bot(command_prefix='!')
+COMMAND_PREFIX = '!'
 
+bot = commands.Bot(command_prefix=COMMAND_PREFIX)
+
+chat_client = ChatClient()
 class_client = ClassClient()
 feat_client = FeatClient()
 roll_client = RollClient()
@@ -29,13 +33,11 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if 'tangle' in message.content.lower():
-        response = '🐍Ssssssssss 🐍'
-        return await message.channel.send(response)
+    if not message.content.startswith(COMMAND_PREFIX):
+        special = chat_client.check_for_special_chats(message)
 
-    if '\\ashrpg/' in message.content.lower():
-        response = '\\ashrpg/'
-        return await message.channel.send(response)
+        if special:
+            return await message.channel.send(special)
 
     await bot.process_commands(message)
 
@@ -87,12 +89,13 @@ async def roll_dice(ctx, *args):
     """
     value = ''.join(args)
 
-    dice_roll = roll_client.roll_dice(value)
+    roll_string, total_roll = roll_client.roll_dice(value)
 
-    if not dice_roll:
+    if not (roll_string and total_roll):
         response = Embed(title=f"Dice Roll Not Valid: \"{value}\"", color=Color.red())
     else:
-        response = Embed(title=f"{dice_roll}", color=Color.green())
+        response = Embed(title=f"{total_roll}", color=Color.green())
+        response.add_field(name='Dice Rolled', value=roll_string)
 
     await ctx.send(embed=response)
 
