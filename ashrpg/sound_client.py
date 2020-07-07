@@ -9,13 +9,15 @@ from time import sleep
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
+DOWNLOAD_DIR = 'downloads'
+
 ytdl_format_options = {
     'format': 'bestaudio/best',
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
         'preferredcodec': 'mp3',
     }],
-    'outtmpl': 'downloads/%(extractor)s-%(id)s-%(title)s.mp3',
+    'outtmpl': f'{DOWNLOAD_DIR}/%(extractor)s-%(id)s-%(title)s.mp3',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -44,25 +46,32 @@ class SoundClient():
     async def play_sound(self, sound, ctx, loop):
         to_play = self.sounds.get(sound, '')
         if not to_play:
-            to_play = random.choice(list(self.sounds.values()))
+            sound = random.choice(list(self.sounds.keys()))
+            to_play = self.sounds[sound]
 
         voice_channel = ctx.author.voice.channel
 
         if voice_channel:
             await voice_channel.connect()
+            player = None
 
-            player = await YTDLSource.from_url(to_play, loop=loop, stream=False)
+            if os.path.isfile(f"{DOWNLOAD_DIR}/{sound}.mp3"):
+                player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(f"{DOWNLOAD_DIR}/{sound}.mp3"))
+            else:
+                print(f"Downloading new file for sound [{sound}]")
+                player = await YTDLSource.from_url(to_play, sound, loop=loop, stream=False)
+
             ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
 
             while ctx.voice_client.is_playing():
-                sleep(1)
+                sleep(2)
 
             await ctx.voice_client.disconnect()
         else:
             print("User is not in a voice channel")
 
 class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
+    def __init__(self, source, *, data, volume=0.7):
         super().__init__(source, volume)
 
         self.data = data
@@ -71,7 +80,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.url = data.get('url')
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
+    async def from_url(cls, url, sound, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
 
@@ -80,4 +89,5 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
+        os.rename(filename, f"{DOWNLOAD_DIR}/{sound}.mp3")
+        return cls(discord.FFmpegPCMAudio(f"{DOWNLOAD_DIR}/{sound}.mp3", **ffmpeg_options), data=data)
