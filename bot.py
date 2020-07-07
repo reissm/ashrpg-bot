@@ -1,11 +1,13 @@
 import os
 import random
 import urllib3
+import difflib
 
 from ashrpg.chat_client import ChatClient
 from ashrpg.class_client import ClassClient
 from ashrpg.feat_client import FeatClient
 from ashrpg.roll_client import RollClient
+from ashrpg.sound_client import SoundClient, YTDLSource
 from dotenv import load_dotenv
 from discord import Embed, Color, Game
 from discord.ext import commands
@@ -13,6 +15,7 @@ from discord.ext import commands
 load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 TOKEN = os.getenv('DISCORD_TOKEN').strip()
+GUILD = os.getenv('DISCORD_GUILD', '').strip()
 
 COMMAND_PREFIX = '!'
 
@@ -22,6 +25,7 @@ chat_client = ChatClient()
 class_client = ClassClient()
 feat_client = FeatClient()
 roll_client = RollClient()
+sound_client = SoundClient()
 
 @bot.event
 async def on_ready():
@@ -30,6 +34,9 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    if GUILD and str(message.guild) != GUILD:
+        return
+
     if message.author == bot.user:
         return
 
@@ -99,7 +106,7 @@ async def roll_dice(ctx, *args):
 
     await ctx.send(embed=response)
 
-@bot.command(name='refresh', help='<cache> -- Refresh cache(s) for the various datapoints')
+@bot.command(name='refresh')
 async def refresh_cache(ctx, cache: str):
     refreshed = 'nothing'
 
@@ -115,5 +122,9 @@ async def refresh_cache(ctx, cache: str):
         refreshed = 'feats'
 
     await ctx.send(f"Refreshed cache for {refreshed}")
+
+@bot.command(name='sfx')
+async def bonk_sound(ctx, sound: str = ''):
+    await sound_client.play_sound(sound, ctx, bot.loop)
 
 bot.run(TOKEN)
