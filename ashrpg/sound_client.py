@@ -11,7 +11,11 @@ youtube_dl.utils.bug_reports_message = lambda: ''
 
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': 'downloads/%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+    }],
+    'outtmpl': 'downloads/%(extractor)s-%(id)s-%(title)s.mp3',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
