@@ -124,7 +124,26 @@ async def refresh_cache(ctx, cache: str):
     await ctx.send(f"Refreshed cache for {refreshed}")
 
 @bot.command(name='sfx')
-async def bonk_sound(ctx, sound: str = ''):
+async def sound_effect(ctx, sound: str = ''):
     await sound_client.play_sound(sound, ctx, bot.loop)
+
+@bot.command(name='audit')
+@commands.is_owner()
+async def get_audit_for_bot(ctx, *args):
+    response = Embed(title="Audit list for the bot. See console for more details", color=Color.red())
+    guild_list = []
+
+    for guild in bot.guilds:
+        response.add_field(name='Guild Name', value=guild.name)
+        guild_list.append({
+            'id': guild.id,
+            'name': guild.name,
+            'ownerId': guild.owner_id,
+            'description': guild.description,
+        })
+
+    print(guild_list)
+
+    await ctx.send(embed=response)
 
 bot.run(TOKEN)
