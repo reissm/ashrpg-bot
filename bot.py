@@ -16,7 +16,6 @@ from discord.ext import commands
 load_dotenv()
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 TOKEN = os.getenv("DISCORD_TOKEN").strip()
-GUILD = os.getenv("DISCORD_GUILD", "").strip()
 
 COMMAND_PREFIX = "!"
 
@@ -40,9 +39,6 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if GUILD and str(message.guild) != GUILD:
-        return
-
     if message.author == bot.user:
         return
 
