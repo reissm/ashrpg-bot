@@ -1,11 +1,13 @@
 from enum import Enum
 from discord import Color
 
+
 class FeatTypes(Enum):
     DIVINE = Color.from_rgb(255, 255, 255)
     MARTIAL = Color.orange()
     SKILL = Color.purple()
     WILD = Color.dark_green()
+
 
 class ClassColors(Enum):
     BARBARIAN = Color.from_rgb(196, 30, 59)
