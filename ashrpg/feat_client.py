@@ -1,5 +1,6 @@
 import requests
 from discord import Embed, Color
+from html2text import html2text
 from .enums import FeatTypes
 
 
@@ -22,14 +23,24 @@ class FeatClient:
             map(lambda x: x["name"].lower(), feats)
         ):
             # Only a single feat was found, so return all the details about it
-            feat = feats[0]
+            feat = (
+                feats[0]
+                if len(feats) == 1
+                else list(
+                    filter(lambda x: x["name"].lower() == str(query).lower(), feats)
+                )[0]
+            )
             feat["featType"] = FeatTypes[feat["featType"]]
 
             res = Embed(title=f"{feat['name']}", color=feat["featType"].value)
             res.add_field(
                 name="Type", value=feat["featType"].name.capitalize(), inline=False
             )
-            res.add_field(name="Description", value=feat["description"], inline=False)
+            res.add_field(
+                name="Description",
+                value=html2text(feat["description"]).strip(),
+                inline=False,
+            )
             res.add_field(
                 name="Requirements",
                 value="\n".join(feat["requirements"])

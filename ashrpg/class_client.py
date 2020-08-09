@@ -1,5 +1,6 @@
 import requests
 from discord import Embed, Color
+from html2text import html2text
 from .enums import ClassColors
 
 
@@ -53,7 +54,13 @@ class ClassClient:
             map(lambda x: x["name"].lower(), talents)
         ):
             # Only a single talent found, so return all details about it
-            talent = talents[0]
+            talent = (
+                talents[0]
+                if len(talents) == 1
+                else list(
+                    filter(lambda x: x["name"].lower() == str(query).lower(), talents)
+                )[0]
+            )
 
             res = Embed(
                 title=f"{talent['name']} -- Level {talent['level']} {class_name.capitalize()} {talent['talentType'].capitalize()}",
@@ -61,7 +68,11 @@ class ClassClient:
             )
             res.add_field(name="Cast Type", value=talent["castTime"], inline=True)
             res.add_field(name="Duration", value=talent["duration"], inline=True)
-            res.add_field(name="Description", value=talent["description"], inline=False)
+            res.add_field(
+                name="Description",
+                value=html2text(talent["description"]).strip(),
+                inline=False,
+            )
             res.add_field(
                 name="Requirements",
                 value="\n".join(talent["requirements"])

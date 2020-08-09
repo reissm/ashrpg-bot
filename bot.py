@@ -8,7 +8,8 @@ from ashrpg.chat_client import ChatClient
 from ashrpg.class_client import ClassClient
 from ashrpg.feat_client import FeatClient
 from ashrpg.roll_client import RollClient
-from ashrpg.sound_client import SoundClient, YTDLSource
+from ashrpg.sound_client import SoundClient
+from ashrpg.spell_client import SpellClient
 from dotenv import load_dotenv
 from discord import Embed, Color, Game
 from discord.ext import commands
@@ -27,6 +28,7 @@ class_client = ClassClient()
 feat_client = FeatClient()
 roll_client = RollClient()
 sound_client = SoundClient()
+spell_client = SpellClient()
 
 
 @bot.event
@@ -101,6 +103,25 @@ async def get_class_info(ctx, cls: str, *args):
     await ctx.send(content=f"{ctx.author.mention}", embed=response)
 
 
+@bot.command(name="spell")
+async def get_spell_info(ctx, *args):
+    """
+    Search for spells based on various different fields:
+    * Spell cost
+    * Spell domain
+    * Spell name
+    """
+
+    if args and len(args) > 0:
+        if args[0].lower() == 'cost':
+            response = spell_client.get_by_cost(" ".join(args[1:]))
+        elif args[0].lower() == 'domain':
+            response = spell_client.get_by_domain(" ".join(args[1:]))
+        else:
+            response = spell_client.search(" ".join(args))
+
+    await ctx.send(content=f"{ctx.author.mention}", embed=response)
+
 @bot.command(name="roll", help="<#d#(+|-#)> -- Roll dice based on the parameters")
 async def roll_dice(ctx, *args):
     """
@@ -119,8 +140,12 @@ async def roll_dice(ctx, *args):
 
     await ctx.send(embed=response)
 
+@bot.command(name="sfx")
+async def sound_effect(ctx, sound: str = ""):
+    await sound_client.play_sound(sound, ctx, bot.loop)
 
 @bot.command(name="refresh")
+@commands.is_owner()
 async def refresh_cache(ctx, cache: str):
     refreshed = "nothing"
 
@@ -134,14 +159,11 @@ async def refresh_cache(ctx, cache: str):
     elif cache.lower() == "feats":
         feat_client.refresh_cache()
         refreshed = "feats"
+    elif cache.lower() == "spells":
+        spell_client.refresh_cache()
+        refreshed = "spells"
 
     await ctx.send(f"Refreshed cache for {refreshed}")
-
-
-@bot.command(name="sfx")
-async def sound_effect(ctx, sound: str = ""):
-    await sound_client.play_sound(sound, ctx, bot.loop)
-
 
 @bot.command(name="audit")
 @commands.is_owner()
